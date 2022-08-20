@@ -3,7 +3,9 @@ package com.fabio.libraryapi.api.resource;
 import com.fabio.libraryapi.api.dto.BookDTO;
 import com.fabio.libraryapi.entity.Book;
 import com.fabio.libraryapi.service.BookService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -50,7 +53,9 @@ public class BookControllerTest {
         String json = new ObjectMapper().writeValueAsString(dto);
 
         //criando uma requisicao
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(BOOK_API)
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                //metodo a ser validado nesse caso post
+                .post(BOOK_API)
                 //passa o conteudo do tipo joson
                 .contentType(MediaType.APPLICATION_JSON)
                 //servidor aceita requisicoes do tipo json
@@ -70,7 +75,26 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Deve lancar erro de validacao quando nai houver dados suficientes")
-    public void createInvalidBookTest(){
+    public void createInvalidBookTest() throws Exception{
+        //recebe um ojeto e trasforma em json
+        //passa um book vazio
+        String json = new ObjectMapper().writeValueAsString(new BookDTO());
+        //cria a requisicao
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                //metodo a ser validado
+                .post(BOOK_API)
+                //passa o conteudo do tipo joson
+                .contentType(MediaType.APPLICATION_JSON)
+                //servidor aceita requisicoes do tipo json
+                .accept(MediaType.APPLICATION_JSON)
+                //envia o json criado para a requisicao
+                .content(json);
+        //valida a requisico
+        mvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors",hasSize(3)));
+
+
 
     }
 

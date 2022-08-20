@@ -1,10 +1,14 @@
 package com.fabio.libraryapi.service;
 
 import com.fabio.libraryapi.entity.Book;
+import com.fabio.libraryapi.model.repository.BookRepository;
+import com.fabio.libraryapi.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -16,10 +20,14 @@ public class BookServiceTest {
 
     BookService service;
 
+    //moca o comportamento do repository
+    @MockBean
+    BookRepository repository;
+
     //executa o metodo antes de cada teste
     @BeforeEach
     public void setUp(){
-
+        this.service=new BookServiceImpl(repository);
     }
 
     @Test
@@ -27,6 +35,15 @@ public class BookServiceTest {
     public void saveBookTest(){
         //cenario
         Book book = Book.builder().isbn("123").title("As aventuras").author("Fulano").build();
+        //simulando o conportamento do repository
+        Mockito.when(repository.save(book)).thenReturn(Book
+                .builder()
+                .id(1l)
+                .isbn("123")
+                .title("As aventuras")
+                .author("Fulano")
+                .build()
+        );
         //execucao
         Book savedBook = service.save(book);
         //verificacao

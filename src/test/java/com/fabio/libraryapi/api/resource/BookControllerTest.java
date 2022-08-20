@@ -93,9 +93,6 @@ public class BookControllerTest {
         mvc.perform(request)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("errors",hasSize(3)));
-
-
-
     }
 
 

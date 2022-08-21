@@ -3,6 +3,7 @@ package com.fabio.libraryapi.api.resouce;
 import com.fabio.libraryapi.api.dto.BookDTO;
 import com.fabio.libraryapi.api.exception.ApiErros;
 import com.fabio.libraryapi.entity.Book;
+import com.fabio.libraryapi.exception.BusinessException;
 import com.fabio.libraryapi.service.BookService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -40,4 +41,10 @@ public class BookController {
         BindingResult bindingResult =ex.getBindingResult();
         return new ApiErros(bindingResult);
     }
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErros handleBusinessException(BusinessException ex) {
+        return new ApiErros(ex);
+    }
+
 }

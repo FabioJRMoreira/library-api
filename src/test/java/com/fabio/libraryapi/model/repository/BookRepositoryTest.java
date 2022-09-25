@@ -11,6 +11,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.nio.file.OpenOption;
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.setAllowComparingPrivateFields;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -49,6 +53,45 @@ public class BookRepositoryTest {
         boolean exists = repository.existsByIsbn(isbn);
         //verificacao
         assertThat(exists).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("Deve obter um livro por id")
+    public void findByIdTest(){
+        Book book = createNewBook();
+        entityManager.persist(book);
+        //cenario
+        Optional<Book> foundBook = repository.findById(book.getId());
+        //verificacao
+        assertThat(foundBook.isPresent()).isTrue();
+     }
+    @Test
+    @DisplayName("Dev Salvar um livro")
+    public void saveBookTest(){
+        //cenario
+        Book book = createNewBook();
+        //execucao
+        Book saveBook= repository.save(book);
+        //verificacao
+        assertThat(saveBook.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Deve deletar um livro")
+    public void deletBook(){
+        //cenarrio
+        Book book = createNewBook();
+        entityManager.persist(book);
+        //execucao
+        //busca o livro persistido
+        Book bookFound = entityManager.find(Book.class,book.getId());
+        //Deleta o livro
+        repository.delete(bookFound);
+        //procura novamente para ter certeza que o livro foi deletado
+        Book deleteBook = entityManager.find(Book.class,book.getId());
+        //verifica se o obj é nulo mesmo.
+        assertThat(deleteBook).isNull();
     }
 
     private Book createNewBook() {
